@@ -20,6 +20,8 @@
     "prettier:fix": "prettier --write .",
     "lint-prettier": "yarn lint:check && yarn prettier:check",
     "test": "jest --runInBand --passWithNoTests",
+    "test:routes": "node scripts/test-all-endpoints.js",
+    "test:flows": "node scripts/test-all-flows.js",
     "test:watch": "jest --watch",
     "seed": "ts-node src/seed/seedData.ts",
     "prepare": "husky"
