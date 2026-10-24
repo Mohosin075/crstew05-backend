@@ -9,7 +9,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     name: { type: String, trim: true },
     fullName: { type: String, trim: true },
     email: { type: String, unique: true, lowercase: true, required: true },
-    profile: { type: String, default: '/images/1767048629458-l94gk7.jpg' },
+    profile: { type: String, default: '' },
     phone: { type: String },
     description: { type: String },
 
@@ -96,6 +96,8 @@ const UserSchema = new Schema<IUser, UserModel>(
 
 // ------------------ INDEXES ------------------
 UserSchema.index({ location: '2dsphere' }) // Geo queries support
+UserSchema.index({ verified: 1, createdAt: 1 }) // Optimize unverified user cleanup cron
+UserSchema.index({ role: 1, status: 1 }) // Optimize user filtering by role and status
 
 // ------------------ PRE HOOKS ------------------
 UserSchema.pre('save', async function (next) {

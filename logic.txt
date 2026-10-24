@@ -1,0 +1,618 @@
+THE COACH PROFILE
+Final Product Requirements & Role Specifications
+Version 1.0 — August 25, 2026
+Hi Abdulla,
+Thanks for following up. I’ve finalized the product direction for the five user roles: Coaches, Collegiate Athletic Programs,
+Professional Teams, Recruiting Agencies, and Organizations.
+I’ve attached the final product requirements document. It outlines the core features, user flows, permissions, monetization,
+data structure, and launch priorities for each role.
+One important point: I want us to build the platform in a way that supports long-term scale. The Coach Profile should not
+simply be a networking/job board. The long-term vision is to become the professional identity, recruiting marketplace, and
+career network for football.
+For the initial build, please prioritize the P0 requirements and architecture in this document. P1 features should be designed
+for in the architecture but should not create unnecessary scope for the initial launch.
+The most important product principles are:
+1. Coaches should be able to create value quickly without a long, frustrating onboarding process.
+2. Coach profiles should become a permanent professional coaching identity.
+3. Programs, teams, and recruiting agencies should be able to discover, evaluate, save, contact, and manage coaches.
+4. “Express Interest” should create a real recruiting workflow, not just a notification.
+5. Verification, search, matching, analytics, referrals, and network effects should be built into the foundation.
+6. The platform must be structured as a two-sided marketplace: coaches on one side and organizations/programs/recruiters
+on the other.
+7. The underlying data model should be structured so we can later support AI matching, recruiting analytics, career histories,
+enterprise tools, and additional monetization without rebuilding the core platform.
+Please use this document as the source of truth for the product requirements going forward. If a requirement is unclear or a
+proposed technical implementation would materially change the user experience, please flag it before development rather
+than making a product decision independently.
+Thank you,
+Charles
+1. Product Vision
+The Coach Profile (TCP) is intended to become the professional identity, recruiting marketplace, and career network for
+football. The long-term product should connect coaches with collegiate programs, professional teams, recruiting agencies,
+and football organizations while maintaining a trusted, verified professional graph of the football coaching ecosystem.
+The initial product should focus on a strong core loop: Create Profile → Get Verified → Build Network → Discover Opportunities
+→ Express Interest → Get Discovered → Communicate → Get Hired → Update Career → Invite Coaches.
+2. Product Principles
+• Fast time-to-value: a coach should be able to enter the product quickly without completing a long application.
+• Professional identity: the Coach Profile should become a durable career record rather than a temporary job-search
+profile.
+• Two-sided marketplace: coaches are one side; programs, teams, agencies, and organizations are the other.
+• Structured data first: critical career and recruiting information must be stored in structured fields for search, matching,
+analytics, and future AI.
+• Trust and verification: identity, experience, credentials, and organizations should have distinct verification states.
+• Privacy by design: recruiting activity, internal notes, and sensitive information must respect permissions.
+• Network effects: referrals, shareable profiles, coaching relationships, and program discovery should compound user
+growth.
+• Build for scale: architecture should support future enterprise recruiting tools without requiring a core rebuild.
+3. Role Specifications
+1. COACH
+Purpose
+The Coach is the primary supply-side user. The product should help coaches build a verified professional identity, network,
+discover opportunities, express interest in programs, communicate with recruiters/programs, and advance their careers.
+Core access
+Free account with statewide networking and core profile functionality. Pro membership at $19.88/month unlocks nationwide
+access, expanded visibility, advanced discovery/matching, and other premium career features.
+Key features
+• Account creation with email/password plus Google/Apple sign-in where technically feasible.
+• Fast onboarding with the ability to Skip and Complete Later.
+• Resume upload/import to pre-populate coaching history, education, credentials, positions, and experience.
+• Professional profile with photo, headline, bio, coaching philosophy, experience, education, credentials, recruiting
+footprint, expertise, career preferences, and career history.
+• Verified identity/experience/credential badges.
+• Shareable public profile URL with privacy controls.
+• Coach search and statewide/nationwide networking.
+• Opportunity discovery with filters and personalized match scores.
+• Express Interest in a program or opportunity with selectable information to share and optional message.
+• Messages with programs, teams, recruiters, and other coaches subject to permissions.
+• Saved opportunities.
+• Profile views and career analytics.
+• Notifications for opportunity matches, messages, profile activity, verification, and recruiting activity.
+• Referral/invite functionality.
+• Career status: Actively Looking, Open to Opportunities, Currently Coaching, Not Looking, etc.
+• Discreet recruiting/visibility controls so a coach can limit who sees recruiting activity.
+• Career history that can be updated when a coach changes positions.
+• Future-ready areas for coaching tree, recommendations, video introduction, AI career assistant, and paid coaching
+services.
+Coach flow
+• Create account → choose Coach → verify email → basic information.
+• Create a minimum viable profile and enter the app quickly.
+• Progressively complete profile sections from Home/Profile.
+• Verify identity/experience/credentials.
+• Choose career status and preferences.
+• Browse opportunities and coaches/programs.
+• View opportunity/program → Express Interest or Apply/Contact.
+• Program/recruiter receives the coach and can save/contact/manage the candidate.
+• Coach receives notifications and communicates through Messages.
+• Coach updates career status when hired and adds the new position to career history.
+Coach permissions
+• Edit own profile and career history.
+• Control profile visibility and contact preferences.
+• Choose what information is shared when expressing interest.
+• Send/receive messages according to platform rules.
+• Save/remove opportunities and profiles.
+• Delete account and request data export where required.
+• Cannot edit program/team/recruiter records or other coaches’ profiles.
+2. COLLEGIATE ATHLETIC PROGRAM
+Purpose
+A verified college athletic program is the primary institutional recruiting user. It should be able to build an organization
+presence, post opportunities, discover coaches, manage candidates, and communicate with coaches.
+Core access
+Program accounts should have an organization profile and role-based access. Pricing can be subscription-based, with a
+future tiered structure such as Recruiting and Recruiting Pro. The exact commercial packaging can be finalized separately
+from the core product architecture.
+Key features
+• Verified college/program profile with school, conference/level, location, sports/football program information, website,
+logo, and authorized users.
+• Post and manage coaching opportunities.
+• Search and filter coaches by position, level, experience, geography, recruiting footprint, expertise, credentials, career
+status, and other structured fields.
+• View coach profiles subject to privacy settings.
+• Receive and manage Express Interest submissions.
+• Save/favorite coaches.
+• Message coaches.
+• Candidate pipeline: Discovered → Saved → Contacted → Interested → Interview → Offer → Hired.
+• Internal notes and candidate management for authorized team members.
+• Match scores and recommended coaches.
+• Dashboard showing open roles, candidate activity, profile views, and recruiting activity.
+• Multiple staff/user accounts with permissions.
+• Program badge/verification indicator.
+Program flow
+• Create organization account → verify organization → create program profile → add authorized users.
+• Post opportunity → configure requirements → publish.
+• Search/discover coaches → review profiles → save/contact/express recruiting interest.
+• Receive coach Express Interest → review profile → move candidate through pipeline.
+• Message/interview/manage candidate → Offer → Hired.
+• Update hired coach’s record where appropriate and maintain the program’s recruiting history.
+Program permissions
+• Organization Admin: full organization and user management.
+• Recruiting/Staff User: search, save, message, manage candidates, and post/manage opportunities if permitted.
+• Read-only user: view recruiting information without changing records.
+• Program users cannot edit a coach’s profile, experience, credentials, or career history.
+• Only authorized organization admins can add/remove program users.
+3. PROFESSIONAL TEAM
+Purpose
+Professional teams should use the same core recruiting infrastructure as colleges but with professional-team-specific fields,
+workflows, and privacy requirements.
+Key features
+• Verified professional team/organization profile.
+• Post coaching and football staff opportunities.
+• Search/filter coaches using structured professional criteria.
+• Candidate pipeline and recruiting workspace.
+• Save, compare, contact, and manage candidates.
+• Internal notes and multi-user recruiting access.
+• Candidate match scoring.
+• Private recruiting activity where appropriate.
+• Organization analytics and recruiting activity dashboard.
+Professional team flow
+• Create team account → organization verification → configure users/roles.
+• Create/post opportunity → define requirements.
+• Search/recommendations → review coaches → save/contact.
+• Receive Express Interest → evaluate → interview → offer → hired.
+• Maintain historical recruiting records and organization activity.
+Permissions
+• Team Admin: full organization/user/recruiting management.
+• Authorized Recruiting/Football Operations users: candidate management and messaging.
+• Read-only users: view permitted records.
+• Sensitive recruiting notes should be visible only to authorized team members.
+4. RECRUITING AGENCY / SEARCH FIRM
+Purpose
+Recruiting agencies/search firms should be able to manage multiple searches and source candidates across the verified
+coach network.
+Key features
+• Verified recruiting agency profile.
+• Multiple active searches/jobs.
+• Search across coaches using advanced filters.
+• Save candidates to specific searches.
+• Candidate pipeline per search.
+• Internal notes and collaboration.
+• Message candidates.
+• Track candidate status.
+• Candidate recommendations/match scoring.
+• Agency dashboard showing active searches and candidate activity.
+• Ability to manage multiple client organizations where applicable.
+Agency flow
+• Create agency account → verification → add authorized recruiters.
+• Create client/search/project → define position requirements.
+• Search/discover coaches → save candidates to search → contact.
+• Manage candidate through pipeline → interview → submit/present → hired/closed.
+• Maintain separate client/search data and permissions.
+Permissions
+• Agency Admin: manage agency, recruiters, searches, and permissions.
+• Recruiter: manage assigned searches and candidates.
+• Recruiters should only see client/search information for which they are authorized.
+• Client-sensitive notes and candidate information must not be exposed across unrelated searches.
+5. ORGANIZATION
+Purpose
+Organizations are non-team entities such as coaching associations, conferences, camps, clinics, training organizations,
+media organizations, nonprofits, or other football-related groups.
+Key features
+• Verified organization profile.
+• Organization badge.
+• Ability to post approved opportunities, events, camps, clinics, and relevant announcements.
+• Ability to discover/search coaches where permitted.
+• Ability to contact coaches subject to permissions.
+• Community/content capabilities in future phases.
+• Potential sponsorship/advertising placements.
+• Member/referral programs.
+• Organization analytics.
+Organization flow
+• Create organization account → select organization type → verification.
+• Build organization profile → add authorized users.
+• Publish opportunities/events/content.
+• Discover coaches or invite coaches to relevant programs/events.
+• Manage responses and communications.
+Permissions
+• Organization Admin: full profile/content/user management.
+• Authorized Staff: create/manage permitted content and communications.
+• Organizations do not receive unrestricted access to private coach information.
+4. Cross-Platform Requirements
+A. PRODUCT ARCHITECTURE
+• The five roles must share a common account/identity system but have role-specific dashboards, permissions, and
+workflows.
+• Use structured data for Coach, Organization, Program/Team, Opportunity, Experience, Credential, Connection, Interest,
+Message, Application/Candidate, Search, and Hire objects.
+• Do not store critical recruiting information only as free-form text. Structured fields are required for search, filtering,
+matching, analytics, and future AI.
+• Build role-based access control from the beginning.
+• Design the database so a coach can have multiple historical positions and relationships with multiple organizations.
+• Separate public profile data, private coach data, recruiting activity, internal organization notes, and sensitive account
+information.
+• Build APIs/services so future web and mobile clients can use the same backend.
+B. SEARCH & MATCHING
+• Search must support structured filters rather than keyword-only search.
+• Coach filters should include position, level, years of experience, geography, recruiting footprint, expertise, credentials,
+career status, education, and other relevant structured attributes.
+• Opportunity filters should include position, level, location, organization type, experience requirements, and career
+preferences.
+• Match scores should be explainable at a high level—for example: Position match, Experience match, Geography match,
+Recruiting match, and Level match.
+• Do not create a simplistic 'best coach' ranking. Use match/fit indicators instead.
+C. VERIFICATION & TRUST
+• Identity verification should be separate from experience verification.
+• Credentials should support document upload and verification status.
+• Verified organization/program accounts should be clearly distinguished from unverified accounts.
+• Verification status should be stored as structured data with timestamps and, where applicable, verification source.
+• Build for moderation/reporting of fraudulent profiles, impersonation, spam, and inappropriate content.
+D. PRIVACY & RECRUITING DISCRETION
+• Coaches must control profile visibility.
+• Coaches should be able to limit recruiting visibility and contact.
+• Current employer information and recruiting activity should not automatically be exposed to everyone.
+• Organization internal notes must never be visible to coaches or unrelated organizations.
+• Messages and recruiting records must respect role permissions.
+• Include account deletion, privacy settings, and appropriate data export/deletion workflows.
+E. NETWORK EFFECTS & GROWTH
+• Referral/invite system should be part of the initial architecture.
+• Coach profiles should have shareable URLs.
+• Founding Coach/Founding Member badges should be supported.
+• Track referral source and referral relationships.
+• Allow coaches to invite members of their coaching network.
+• Track acquisition source, activation, profile completion, connection creation, opportunity views, Express Interest events,
+and conversion to Pro.
+F. MONETIZATION
+• Coach Free: statewide networking/core profile and limited discovery.
+• Coach Pro: $19.88/month for nationwide access and premium career/networking functionality.
+• Programs, Professional Teams, Recruiting Agencies, and Organizations should be architected for paid subscriptions
+and/or premium features.
+• Do not hard-code pricing into the backend in a way that prevents future plans, trials, promotional pricing, annual plans,
+or enterprise contracts.
+• Support feature entitlements by subscription plan rather than creating separate code paths for each price.
+• Potential future revenue streams include enterprise recruiting software, premium search, sponsored opportunities,
+advertising/sponsorships, paid coaching services, and transaction fees.
+G. NOTIFICATION SYSTEM
+• Notifications should be event-driven and support in-app notifications first, with email/push as appropriate.
+• Events should include new message, opportunity match, profile view where permitted, Express Interest, verification,
+candidate movement, saved opportunity changes, and relevant organization activity.
+• Users should be able to control notification preferences.
+H. ANALYTICS
+• Track activation and conversion funnel: account created → profile started → profile completed → verified → first connection
+→ first opportunity view → first Express Interest → first message → subscription.
+• Track marketplace health: active coaches, active programs, active opportunities, coach-program connections,
+applications/interests, interviews, hires, and retention.
+• Do not rely solely on vanity metrics such as downloads.
+5. DAILY ENGAGEMENT & COACHING NETWORK FEED
+The platform must not function only as a periodic job-search tool. The long-term objective is to make The Coach Profile a
+daily-use professional network for football coaches. The product should have a continuously updated Coaching Network
+feed that gives coaches a reason to open the app every day, even when they are not actively looking for a job.
+A. Daily Engagement Engine
+• Create a dedicated Coaching Network / Feed experience separate from the career dashboard.
+• The feed should continuously update with relevant coaching content, professional activity, opportunities, news, and
+discussions.
+• The feed must be personalized based on coaching position, level, geography, experience, career status, network,
+followed users, interests, opportunities viewed, and engagement history.
+• Support two feed modes: Following (content from people/accounts the coach follows) and For You (algorithmically
+recommended content).
+• The feed should create a daily habit without becoming a generic sports-fan news feed.
+B. Content Types
+• Coach posts: career updates, coaching philosophy, practice ideas, recruiting insights, accomplishments, questions,
+photos, and videos.
+• Coaching News: coaching hires, promotions, staff changes, openings, retirements, major coaching industry
+developments, and relevant rules/industry updates.
+• Coaching Carousel: a dedicated stream of coaching moves such as new hires, openings, promotions, departures, and
+staff changes.
+• Opportunity cards: relevant open coaching positions should appear naturally inside the feed with match scores and
+direct access to the opportunity.
+• Network activity: new positions, certifications, achievements, profile updates, and other professional milestones from
+coaches in the user's network.
+• Coaching discussions: professional questions and conversations focused on coaching, recruiting, player development,
+schemes, staff management, and career development.
+• Coaching IQ: short educational posts/videos such as scheme breakdowns, technique instruction, recruiting tips,
+practice organization, and coaching lessons.
+• Trending in Coaching: topics and discussions receiving significant engagement across the network.
+• Coach Spotlight / Coach of the Day or Week: highlighted coaches to encourage participation and reward quality
+profiles/content.
+• Program and organization content: verified programs, teams, agencies, and organizations can publish relevant
+opportunities, announcements, clinics, camps, events, and professional updates.
+C. Follow vs. Connect
+• Distinguish between Follow and Connect. Follow means a user wants to see another user's content. Connect means
+users want a professional networking relationship.
+• This distinction should support a much larger social graph without forcing every content relationship to become a formal
+connection.
+D. Personalized Feed
+• For You recommendations should use structured profile information and behavior.
+• Prioritize coaching opportunities, news, people, discussions, and educational content relevant to the user's role and
+career goals.
+• Personalization inputs should include position, coaching level, geography, recruiting footprint, expertise, career status,
+desired positions, followed accounts, connections, opportunities viewed/saved, searches, and content engagement.
+• The architecture should support a future AI-powered recommendation engine without requiring a redesign of the feed.
+E. Content → Network → Opportunity Flywheel
+• The feed must connect content to TCP's career marketplace: Feed → Discover Coach/Program → Follow/Connect →
+Discover Opportunity → Express Interest → Message → Interview/Hire → Career Update → New Content → More Network
+Activity.
+F. Coach Posting & Growth Incentives
+• Allow coaches to publish posts and professional updates.
+• Support achievements such as championships, promotions, certifications, new positions, clinics, speaking
+engagements, and coaching milestones.
+• Provide visibility incentives such as Coach Spotlight, profile boosts, or featured content where appropriate.
+• Allow coaches to share their TCP profile and selected posts externally.
+• Track referrals and attribute new users to coach invitations where applicable.
+G. Communities / Groups — P1
+• Support future communities such as Defensive Coordinators, Offensive Coordinators, DB Coaches, High School
+Coaches, College Coaches, SEC Coaches, Texas Coaches, Recruiting Coordinators, and Strength & Conditioning.
+• Communities should support posts, discussions, moderation, and discovery.
+H. Short-Form Video — P1
+• Plan for short-form coaching video content such as 60-second coaching tips, scheme breakdowns, practice clips,
+recruiting advice, and coaching philosophy.
+• Video should be architected as a future content type rather than required for initial launch.
+I. Daily Home Experience
+• Home should function as a personalized career dashboard with profile completion, profile views, recommended
+opportunities, career activity, and alerts.
+• Feed should function as the continuously changing social/professional engagement surface.
+J. Feed Safety, Quality & Moderation
+• Provide reporting and blocking tools.
+• Support moderation of spam, impersonation, harassment, inappropriate content, and fraudulent recruiting activity.
+• Verified organizations and coaches should be clearly identified.
+• Do not allow the feed to become a generic sports-fan discussion board; content should remain centered on professional
+football/coaching.
+• Build content ranking and moderation controls so low-quality or abusive content does not dominate the network.
+6. FOOTBALL INTELLIGENCE: SCORES, SCHEDULES & FOOTBALL UPDATES
+To create a true daily-use habit, TCP should eventually include football information that coaches care about every day. This
+should be positioned as Football Intelligence for Coaches—not as a generic sports-fan product. The experience should
+connect scores, schedules, news, coaching changes, network activity, and opportunities back to the professional coaching
+ecosystem.
+A. Coverage
+• NCAA Division I: FBS and FCS scores, schedules, rankings, conference information, and relevant news.
+• NCAA Division II: scores, schedules, rankings, conference information, and relevant news.
+• NCAA Division III: scores, schedules, rankings, conference information, and relevant news.
+• Professional football: NFL initially, with the architecture flexible enough to support additional professional leagues in the
+future.
+• Coverage should prioritize football levels that are relevant to TCP's coaching users rather than attempting to cover every
+sport.
+B. Football Section
+• Create a dedicated Football area that can show LIVE, Scores, Schedule, Rankings/Standings, News, and Coaching
+Moves.
+• During game windows, surface live and final scores prominently.
+• Allow users to follow teams, conferences, programs, or levels so relevant games are prioritized.
+• Allow users to receive notifications for selected games, teams, programs, or major coaching events.
+• Keep the Football area distinct enough to be useful while also surfacing relevant football cards inside the personalized
+Coaching Network feed.
+C. Personalized Football Feed
+• Prioritize games and football updates based on the coach's profile, location, level, position, followed programs,
+connections, and interests.
+• Examples: a Texas high school coach may see Texas programs first; a college defensive coordinator may see college
+defensive coaching news and relevant games; a professional coach may see NFL/professional updates first.
+• Do not show an undifferentiated wall of scores. Personalization is essential to keeping the feed useful.
+D. Connect Football Data to the Professional Network
+• Football scores and events should link back to TCP programs, teams, coaches, and opportunities whenever relevant.
+• When a program plays a game, users should be able to navigate from the game/program card to the program's TCP
+profile.
+• When appropriate, surface relevant TCP coaches associated with a program or coaching staff.
+• Coaching changes should connect directly to affected programs and, where appropriate, to qualified coaches in the TCP
+network.
+• Example workflow: Coaching News → Program → Open Position → Matched Coaches → Express Interest → Recruiting
+Pipeline.
+E. Daily / Weekly Programming
+• Weekday: coaching news, coaching carousel, opportunities, network activity, discussions, and educational content.
+• Game days: LIVE football, followed teams, relevant scores, coaching updates, and opportunities.
+• Post-game: results, relevant coaching takeaways, network discussion, and coaching news.
+• Sunday/Monday professional cycle: NFL/professional updates, coaching movement, opportunity changes, and weekly
+recap content.
+F. Data Licensing / Technical Requirement
+• Do not scrape or republish third-party sports sites without permission.
+• Use a legitimate sports-data provider/API with commercial rights appropriate for the intended TCP product.
+• Before implementation, evaluate providers for D1/FBS, FCS, D2, D3, NFL/pro coverage, live score latency, schedules,
+standings, logos, statistics, licensing terms, API limits, and cost.
+• The sports-data layer should be modular so TCP can change providers without rebuilding the product.
+• Store normalized sports entities separately from TCP's internal Coach/Program/Organization entities, with stable
+mapping between them.
+G. Product Positioning
+The objective is not to compete directly with ESPN or NFL.com as a general sports destination. TCP should provide Football
+Intelligence for Coaches: football information that is personalized and directly connected to coaching careers, professional
+networking, recruiting, and opportunities.
+7. Launch Priorities
+• Implement initial personalized feed ranking using structured profile data and followed/connected users.
+• Support coach/program/organization posts and opportunity cards in the feed.
+• Implement Follow and Connect as separate relationship types.
+• Implement the Coaching Network feed foundation with continuously updated professional content.
+• Design the sports-data integration as a modular service/API layer with normalized team, league, game, schedule, and
+standings entities.
+• Design the feed architecture so live football scores, schedules, football news, and coaching updates can be inserted as
+structured content cards.
+• Opportunity cards and program/network activity embedded in the feed.
+• Notifications/event system for fresh content, messages, opportunities, and important football/network activity.
+• Follow and Connect relationship types.
+• Football-content integration architecture: structured game/team/league data cards that can appear in the feed.
+• Feed architecture: content feed, Following/For You structure, post objects, engagement events, and personalized
+ranking foundation.
+P0 — Required for Initial Launch
+1. Reduce onboarding friction and allow Skip/Complete Later.
+2. Add resume upload/import and structure the backend to support future LinkedIn/import integrations.
+3. Implement the five role types with role-based dashboards and permissions.
+4. Implement strong Coach Profile with progressive completion.
+5. Implement Coach/Program/Team/Agency/Organization verification states.
+6. Implement structured coach search and opportunity search.
+7. Implement Express Interest as a true recruiting workflow.
+8. Implement organization-side candidate pipeline.
+9. Implement messaging with role-aware permissions.
+10. Implement opportunities, saved opportunities, notifications, and profile visibility controls.
+11. Implement referral/invite architecture and shareable coach profile URLs.
+12. Implement profile views/basic career analytics.
+13. Implement subscription entitlements so Coach Pro can be priced at $19.88/month without hard-coding the plan into
+individual features.
+14. Build the core data model/API architecture for future AI matching, coaching tree, video, groups, and career analytics.
+• AI-powered personalized feed and recommendations.
+• Short-form video and coaching media.
+• Communities / Groups.
+• Coach Spotlight / Coach of the Day or Week.
+• Trending in Coaching.
+• Coaching IQ short-form educational content.
+• Coaching News and automated Coaching Carousel.
+• Advanced football statistics and analytics where licensing permits.
+• Football-to-coach/program/opportunity linking and personalized game-day feed.
+• Coaching News and Coaching Carousel connected to program/opportunity data.
+• Football notifications.
+• Team/program following and personalized game prioritization.
+• Live scores and game status.
+• Launch Football Intelligence section with NCAA D1/FBS/FCS, D2, D3, and NFL/professional coverage.
+• AI-powered feed and recommendations.
+• Short-form coaching video.
+• Communities/Groups.
+• Coach Spotlight / Coach of the Day or Week.
+• Coaching IQ.
+• Trending in Coaching.
+• Football notifications and followed-team/program experiences.
+• Live D1/FBS, FCS, D2, D3 and professional football scores/schedules.
+• Coaching Carousel automation.
+• Coaching News automation.
+• Full personalized For You algorithm.
+P1 — Architecture Ready, Build After Core Launch
+15. Coaching Tree and relationship graph.
+16. Video introduction and coaching film.
+17. Advanced career analytics.
+18. AI Career Assistant.
+19. Advanced program/recruiter matching.
+20. Groups/communities and coaching feed.
+21. Coach recommendations/referrals.
+22. Paid coaching services marketplace.
+23. Salary/compensation intelligence.
+24. Advanced enterprise recruiting analytics.
+25. Public search-engine-indexable coach profiles where the coach opts in.
+8. Monetization Direction
+Coach pricing: Free for statewide networking/core functionality; Pro at $19.88/month for nationwide access and premium
+career/networking features. The exact B2B pricing tiers may evolve, so subscription plans and feature entitlements must be
+configurable rather than hard-coded.
+Long-term monetization should prioritize the B2B side of the marketplace: recruiting subscriptions, advanced search,
+enterprise recruiting workspaces, sponsored opportunities/advertising, and potentially transactions for paid coaching
+services.
+9. Core Data Model — Developer Direction
+• User / Account
+• Coach Profile
+• Organization
+• Collegiate Program
+• Professional Team
+• Recruiting Agency
+• Opportunity / Job
+• Experience / Position History
+• Education
+• Credential / Certification
+• Expertise
+• Recruiting Footprint
+• Career Preferences
+• Connection
+• Express Interest
+• Application / Candidate Record
+• Recruiting Search
+• Message / Conversation
+• Saved Item
+• Notification
+• Verification Record
+• Referral
+• Subscription / Entitlement
+• Analytics Event
+• Hire / Career Transition
+Relationships must support many-to-many connections where appropriate. A coach can have multiple historical positions,
+multiple connections, multiple Express Interest events, and multiple recruiting relationships. Organization-side internal
+recruiting records must remain permission-controlled.
+10. Privacy, Security & Permissions
+• Enforce permissions server-side and validate authorization on every sensitive API operation.
+• Separate public profile fields from private account information.
+• Separate organization internal notes from coach-visible information.
+• Support profile visibility and contact preferences.
+• Provide discreet recruiting controls.
+• Maintain audit timestamps for verification and important recruiting events.
+• Support account deletion and appropriate data export/deletion requirements.
+• Use secure authentication, password handling, session management, and payment processing through established
+providers.
+11. Acceptance Criteria Before Sign-Off
+• Every role can create an account and is routed to the correct role-specific onboarding/dashboard.
+• Permissions are enforced server-side, not only through UI hiding.
+• A coach can create a useful profile and enter the product without completing every optional field.
+• An organization can post an opportunity and manage candidates.
+• A coach can discover an opportunity and Express Interest.
+• The receiving organization can view the submitted coach data and move the coach through a recruiting pipeline.
+• Messaging respects account role and privacy settings.
+• Verified and unverified users are clearly differentiated.
+• Coach Pro feature access is controlled through subscription entitlements.
+• All major recruiting actions generate appropriate notifications and analytics events.
+• All core entities are stored as structured records suitable for future search/matching/AI.
+• The product is responsive, performant, and usable on current iOS/Android devices and the planned web experience.
+• Any major product or workflow change that affects these requirements is flagged for approval before implementation.
+FINAL DAILY-USE REQUIREMENT
+Before final product sign-off, the development team should demonstrate that TCP can function as a daily-use professional
+network, not merely a profile database or job board. The feed, football intelligence, coaching news, network activity,
+discussions, opportunities, notifications, and personalized recommendations must be treated as connected parts of the core
+product strategy.
+12. Final Developer Instruction
+Please treat this document as the product source of truth for the five roles and the initial platform architecture. The goal is not
+to build every future feature immediately. The goal is to build the P0 experience cleanly while making the backend/data model
+flexible enough to support the P1 roadmap. Any major workflow, permission, pricing, or data-model change that materially
+affects these requirements should be brought back to Charles for approval before implementation.
+IMPORTANT PRODUCT DIRECTION — DAILY HABIT
+The goal is for a coach to use TCP every day, not only when looking for a new job. The Coaching Network feed is therefore a
+strategic product component, not an optional social feature. It should create a professional daily habit while continuously
+feeding users back into networking, opportunities, recruiting, and career advancement. The feed should feel closer to a
+professional coaching network than a generic sports social network.
+IMPORTANT PRODUCT DIRECTION — FOOTBALL INTELLIGENCE
+Football content should be treated as a daily-engagement engine that feeds the professional network, not as a separate
+generic sports app. The desired loop is: Football Event → Content/Score → Coach Engagement → Discussion/Network →
+Program Discovery → Opportunity → Recruiting → Hire → Career Update.
+CRITICAL PRODUCT DIRECTION — BUILD FOR
+DAILY USE
+This is a core requirement of The Coach Profile, not an optional future enhancement. The platform must be designed so
+a football coach has a reason to open TCP every day, even when the coach is not actively looking for a job. TCP should
+combine a professional coaching network, personalized football intelligence, coaching content, community, and
+career opportunities.
+THE DAILY HABIT LOOP
+Football/Coaching Update → Personalized Feed → Coach Engagement → Follow/Connect → Discussion/Content → Opportunity
+Discovery → Express Interest → Recruiting Conversation → Hire/Career Update → New Network Activity → Repeat.
+WHAT A COACH SHOULD SEE WHEN OPENING TCP
+• Personalized Coaching Network Feed with continuously changing content.
+• LIVE football scores and game status when games are being played.
+• Upcoming schedules and results for followed/relevant teams and programs.
+• D1/FBS, FCS, D2, D3, and professional football updates.
+• Coaching News and Coaching Carousel: hires, promotions, openings, departures, retirements, and major staff changes.
+• New coaching opportunities matched to the coach's profile.
+• Updates from coaches, programs, teams, recruiting agencies, and organizations in the user's network.
+• Trending coaching discussions and professional questions.
+• Coaching IQ: short educational coaching content, scheme breakdowns, technique tips, recruiting advice, and practice
+ideas.
+• Who viewed your profile, who followed/connected with you, and relevant network activity.
+• Personalized recommendations for coaches, programs, opportunities, and content.
+• Notifications for important games, teams/programs followed, messages, opportunities, recruiting activity, and network
+events.
+CORE FEED STRUCTURE
+The Feed should have two primary modes: Following and For You. Following shows content from coaches, programs,
+organizations, teams, and other accounts the user follows. For You uses structured profile information and behavior to
+personalize content, football updates, opportunities, discussions, and recommendations.
+CONTENT TYPES REQUIRED IN THE FEED
+• Coach posts and professional updates.
+• Program/team/organization posts.
+• Coaching News.
+• Coaching Carousel.
+• LIVE football scores and game cards.
+• Final scores and game recaps.
+• Upcoming schedules.
+• Rankings/standings where licensed data permits.
+• Relevant football news.
+• Open coaching opportunities.
+• Opportunity match cards with a Match Score.
+• Network activity and career milestones.
+• Professional discussions.
+• Trending in Coaching.
+• Coaching IQ educational content.
+• Coach Spotlight / Coach of the Day or Week.
+• Future short-form coaching video.
+• Future communities/groups.
+IMPORTANT: HOME VS. FEED
+Home and Feed should have different purposes. Home is the coach's career command center: profile completion, profile
+views, career analytics, recommended opportunities, recruiting activity, and alerts. Feed is the daily habit engine: football,
+coaching news, people, discussions, educational content, opportunities, and network activity.
+FOOTBALL INTELLIGENCE IS NOT A GENERIC SPORTS FEED
+Do not build TCP as a general ESPN-style sports destination. Football content must be relevant to people who work in football
+or want to work in football. The product should connect Football Event → Program → Coaches → Network → Opportunity →
+Recruiting.
+EXAMPLE DAILY EXPERIENCE
+• Morning: coaching news, overnight staff changes, new opportunities, network activity, and Coaching IQ.
+• During games: LIVE scores, followed teams, relevant programs, coaching updates, and discussions.
+• After games: final scores, recaps, coaching takeaways, network discussions, and related opportunities.
+• Sunday/Monday: professional football updates, coaching carousel activity, new openings, and weekly recaps.
+• Every day: personalized recommendations, profile views, new connections, messages, and career activity.
+DAILY ENGAGEMENT PRODUCT REQUIREMENTS
+• Track feed impressions, content views, engagement, follows, connections, opportunity clicks, Express Interest events,
+and return frequency.
+• Build notifications and ranking infrastructure so the feed can continuously surface fresh, relevant content.
+• Allow users to follow coaches, programs, teams, organizations, topics, and potentially conferences.
+• Separate Follow from Connect.
+• Provide reporting/blocking/moderation tools.
+• Design the content system to support text, images, links, structured football cards, opportunity cards, and future video.
+• Design the recommendation architecture so an AI-powered feed can be introduced later without rebuilding the content
+system.

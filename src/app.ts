@@ -121,7 +121,7 @@ app.get('/privacy-policy', (req, res) => {
 })
 
 // -------------------- Share deep-link landing (opens crstew05 app) --------------------
-const shareLanding = (kind: 'service' | 'profile', id: string) => {
+const shareLanding = (kind: 'profile', id: string) => {
   const safeId = encodeURIComponent(id)
   const appUri = `crstew05://${kind}/${safeId}`
   return `<!DOCTYPE html>
@@ -144,11 +144,6 @@ const shareLanding = (kind: 'service' | 'profile', id: string) => {
 <script>window.location.replace(${JSON.stringify(appUri)});</script>
 </body></html>`
 }
-
-app.get('/share/service/:id', (req: Request, res: Response) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8')
-  res.status(200).send(shareLanding('service', req.params.id))
-})
 
 app.get('/share/profile/:id', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8')

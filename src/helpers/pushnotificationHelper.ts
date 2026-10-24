@@ -1,15 +1,36 @@
 import admin from 'firebase-admin'
 import config from '../config'
 
-const serviceAccountJson = Buffer.from(
-  config.firebase_service_account_base64!,
-  'base64',
-).toString('utf8')
-const serviceAccount = JSON.parse(serviceAccountJson)
+let isInitialized = false
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-})
+const getFirebaseAdmin = () => {
+  if (isInitialized) return admin
+  if (!config.firebase_service_account_base64) {
+    return null
+  }
+  try {
+    const serviceAccountJson = Buffer.from(
+      config.firebase_service_account_base64,
+      'base64',
+    ).toString('utf8')
+    const serviceAccount = JSON.parse(serviceAccountJson)
+
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(
+          serviceAccount as admin.ServiceAccount,
+        ),
+      })
+    }
+    isInitialized = true
+    return admin
+  } catch {
+    console.warn(
+      '⚠️ Firebase initialization skipped: Invalid or missing service account credentials',
+    )
+    return null
+  }
+}
 
 type NotificationData = { [key: string]: string }
 
@@ -20,8 +41,15 @@ export const sendPushNotification = async (
   data: NotificationData,
   icon?: string,
 ) => {
-  console.log('Sending push notification to:', deviceToken)
-  console.log('Notification data:', data)
+  const firebaseAdmin = getFirebaseAdmin()
+  if (!firebaseAdmin) {
+    console.log(
+      'Firebase not configured. Push notification skipped for token:',
+      deviceToken,
+    )
+    return null
+  }
+
   const message: admin.messaging.Message = {
     token: deviceToken,
     notification: { title, body },
@@ -41,11 +69,11 @@ export const sendPushNotification = async (
   }
 
   try {
-    const response = await admin.messaging().send(message)
+    const response = await firebaseAdmin.messaging().send(message)
     console.log('Successfully sent message:', response)
     return response
   } catch (error: any) {
     console.error('Error sending message:', error?.message, error)
-    throw error
+    return null
   }
 }

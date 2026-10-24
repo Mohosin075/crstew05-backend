@@ -1,7 +1,11 @@
 import express from 'express'
 import { PublicController } from './public.controller'
 import validateRequest from '../../middleware/validateRequest'
-import { FaqValidations, PublicValidation } from './public.validation'
+import {
+  FaqValidations,
+  PublicValidation,
+  updatePublicZodSchema,
+} from './public.validation'
 import { USER_ROLES } from '../../../enum/user'
 import auth from '../../middleware/auth'
 
@@ -9,6 +13,7 @@ const router = express.Router()
 
 router.post(
   '/',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   validateRequest(PublicValidation.create),
   PublicController.createPublic,
 )
@@ -41,8 +46,17 @@ router.delete(
 
 router.get('/:type', PublicController.getAllPublics)
 
-router.delete('/:id', PublicController.deletePublic)
+router.delete(
+  '/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  PublicController.deletePublic,
+)
 
-router.patch('/update/:id', PublicController.updatePublic)
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  validateRequest(updatePublicZodSchema),
+  PublicController.updatePublic,
+)
 
 export const PublicRoutes = router
