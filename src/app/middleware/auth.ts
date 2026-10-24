@@ -76,7 +76,9 @@ const auth =
         )
       }
 
-      const currentRole = userStatusCheck.role || verifyUser.role
+      let currentRole = (userStatusCheck.role || verifyUser.role) as string
+      if (currentRole === 'teams') currentRole = USER_ROLES.TEAM
+      if (currentRole === 'organizations') currentRole = USER_ROLES.ORGANIZATION
 
       if (!currentRole) {
         return next(
@@ -90,14 +92,21 @@ const auth =
       verifyUser.role = currentRole
       req.user = verifyUser
 
-      // Authorize on role
-      if (roles.length > 0 && !roles.includes(currentRole)) {
-        return next(
-          new ApiError(
-            StatusCodes.FORBIDDEN,
-            "You don't have permission to access this API",
-          ),
-        )
+      // Authorize on role (supports both singular and plural role aliases)
+      if (roles.length > 0) {
+        const normalizedAllowedRoles = roles.map(r => {
+          if (r === 'teams') return USER_ROLES.TEAM
+          if (r === 'organizations') return USER_ROLES.ORGANIZATION
+          return r
+        })
+        if (!normalizedAllowedRoles.includes(currentRole)) {
+          return next(
+            new ApiError(
+              StatusCodes.FORBIDDEN,
+              "You don't have permission to access this API",
+            ),
+          )
+        }
       }
 
       return next()
@@ -147,7 +156,9 @@ export const optionalAuth = async (
       return next()
     }
 
-    const currentRole = userStatusCheck.role || verifyUser.role
+    let currentRole = (userStatusCheck.role || verifyUser.role) as string
+    if (currentRole === 'teams') currentRole = USER_ROLES.TEAM
+    if (currentRole === 'organizations') currentRole = USER_ROLES.ORGANIZATION
     verifyUser.role = currentRole
     req.user = verifyUser
     return next()

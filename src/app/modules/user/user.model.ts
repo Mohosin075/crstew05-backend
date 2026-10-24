@@ -106,7 +106,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     password: { type: String, minlength: 6 },
     role: {
       type: String,
-      enum: Object.values(USER_ROLES),
+      enum: [...Object.values(USER_ROLES), 'teams', 'organizations'],
       default: USER_ROLES.USER,
     },
     appId: { type: String },
@@ -179,6 +179,11 @@ const UserSchema = new Schema<IUser, UserModel>(
     // Organization linkage & recruitment bookmarks
     organizationId: { type: Schema.Types.ObjectId, ref: 'Organization' },
     savedCoaches: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+
+    // Network graph (logic.txt §5.C: Separate Follow from Connect)
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    connections: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 
     settings: {
       pushNotification: { type: Boolean, default: true },

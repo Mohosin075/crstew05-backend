@@ -449,6 +449,98 @@ const seed = async () => {
       }
     }
 
+    // 8. Seed Dashboard 1-Click Demo Accounts (matching ROLES_CONFIG)
+    const portalAccounts = [
+      {
+        email: 'admin@thecoachprofile.com',
+        name: 'Jordan Davis',
+        password: 'adminpassword123',
+        role: USER_ROLES.SUPER_ADMIN,
+        orgName: 'TCP Platform Administration',
+        orgType: 'organization',
+      },
+      {
+        email: 'collegiate@thecoachprofile.com',
+        name: 'Sarah Johnson',
+        password: 'collegiatepass123',
+        role: USER_ROLES.COLLEGIATE,
+        orgName: 'Texas Longhorns Athletics',
+        orgType: 'collegiate_program',
+      },
+      {
+        email: 'teams@thecoachprofile.com',
+        name: 'Marcus Vance',
+        password: 'teamspassword123',
+        role: USER_ROLES.TEAM,
+        orgName: 'Dallas Football Operations',
+        orgType: 'professional_team',
+      },
+      {
+        email: 'agency@thecoachprofile.com',
+        name: 'Marcus Vance',
+        password: 'agencypassword123',
+        role: USER_ROLES.AGENCY,
+        orgName: 'Elite Coaching Search Group',
+        orgType: 'recruiting_agency',
+      },
+      {
+        email: 'org@thecoachprofile.com',
+        name: 'Nathan Fox',
+        password: 'orgpassword123',
+        role: USER_ROLES.ORGANIZATION,
+        orgName: 'National Football Coaches Association',
+        orgType: 'organization',
+      },
+    ]
+
+    for (const acc of portalAccounts) {
+      let user = await User.findOne({ email: acc.email })
+      if (!user) {
+        user = await User.create({
+          name: acc.name,
+          fullName: acc.name,
+          email: acc.email,
+          password: acc.password,
+          role: acc.role,
+          status: USER_STATUS.ACTIVE,
+          verified: true,
+          address: { city: 'Austin', country: 'USA' },
+        })
+        console.log(`Created Portal User: ${acc.email} (${acc.role})`)
+      }
+
+      if (acc.role !== USER_ROLES.SUPER_ADMIN) {
+        let userOrg = await Organization.findOne({ owner: user._id })
+        if (!userOrg) {
+          userOrg = await Organization.create({
+            name: acc.orgName,
+            type: acc.orgType,
+            role: acc.role,
+            location: 'Austin, TX',
+            state: 'TX',
+            isVerified: true,
+            verificationStatus: VERIFICATION_STATUS.VERIFIED,
+            isFounding: true,
+            owner: user._id,
+            members: [
+              {
+                user: user._id,
+                role: 'admin',
+                joinedAt: new Date(),
+                lastActive: new Date(),
+              },
+            ],
+            subscription: {
+              plan: 'org_pro',
+              status: 'active',
+            },
+          })
+          await User.findByIdAndUpdate(user._id, { organizationId: userOrg._id })
+          console.log(`Created Organization for ${acc.email}: ${userOrg.name}`)
+        }
+      }
+    }
+
     console.log('✅ Demo seeding finished successfully!')
     process.exit(0)
   } catch (error) {

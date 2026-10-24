@@ -157,6 +157,11 @@ export interface IUser {
   organizationId?: Types.ObjectId
   savedCoaches?: Types.ObjectId[]
 
+  // Network graph (logic.txt §5.C: Separate Follow from Connect)
+  following?: Types.ObjectId[]
+  followers?: Types.ObjectId[]
+  connections?: Types.ObjectId[]
+
   settings?: {
     pushNotification?: boolean
     emailNotification?: boolean

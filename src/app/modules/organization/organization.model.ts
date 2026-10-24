@@ -61,6 +61,8 @@ const OrganizationSchema = new Schema<IOrganization, OrganizationModel>(
         USER_ROLES.TEAM,
         USER_ROLES.AGENCY,
         USER_ROLES.ORGANIZATION,
+        'teams',
+        'organizations',
       ],
       default: USER_ROLES.COLLEGIATE,
     },
