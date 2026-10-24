@@ -4,18 +4,29 @@ import { USER_ROLES } from '../../../enum/user'
 import auth from '../../middleware/auth'
 import { fileAndBodyProcessorUsingDiskStorage } from '../../middleware/processReqBody'
 
+const ALL_ROLES = [
+  USER_ROLES.SUPER_ADMIN,
+  USER_ROLES.ADMIN,
+  USER_ROLES.COACH,
+  USER_ROLES.COLLEGIATE,
+  USER_ROLES.TEAM,
+  USER_ROLES.AGENCY,
+  USER_ROLES.ORGANIZATION,
+  USER_ROLES.USER,
+]
+
 const router = express.Router()
 
 router.post(
   '/',
   fileAndBodyProcessorUsingDiskStorage(),
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   MessageController.sendMessage,
 )
 
 router.get(
   '/:id',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   MessageController.getMessage,
 )
 

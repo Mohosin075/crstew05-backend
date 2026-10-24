@@ -71,8 +71,9 @@ const addNote = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getNotes = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload
   const { id } = req.params
-  const result = await CandidateService.getNotes(id)
+  const result = await CandidateService.getNotes(id, user.userId)
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -82,9 +83,10 @@ const getNotes = catchAsync(async (req: Request, res: Response) => {
 })
 
 const updateRating = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload
   const { id } = req.params
   const { rating } = req.body
-  const result = await CandidateService.updateRating(id, rating)
+  const result = await CandidateService.updateRating(id, rating, user.userId)
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

@@ -5,18 +5,29 @@ import { USER_ROLES } from '../../../enum/user'
 import validateRequest from '../../middleware/validateRequest'
 import { LocationValidation } from './location.validation'
 
+const ALL_ROLES = [
+  USER_ROLES.SUPER_ADMIN,
+  USER_ROLES.ADMIN,
+  USER_ROLES.COACH,
+  USER_ROLES.COLLEGIATE,
+  USER_ROLES.TEAM,
+  USER_ROLES.AGENCY,
+  USER_ROLES.ORGANIZATION,
+  USER_ROLES.USER,
+]
+
 const router = express.Router()
 
 router.get(
   '/search',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   validateRequest(LocationValidation.searchSuggestionsSchema),
   LocationController.searchSuggestions,
 )
 
 router.get(
   '/geocode',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   validateRequest(LocationValidation.geocodeAddressSchema),
   LocationController.geocodeAddress,
 )

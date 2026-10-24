@@ -7,6 +7,17 @@ import { createSupportSchema, updateSupportSchema } from './support.validation'
 
 const router = express.Router()
 
+const ALL_ROLES = [
+  USER_ROLES.SUPER_ADMIN,
+  USER_ROLES.ADMIN,
+  USER_ROLES.COACH,
+  USER_ROLES.COLLEGIATE,
+  USER_ROLES.TEAM,
+  USER_ROLES.AGENCY,
+  USER_ROLES.ORGANIZATION,
+  USER_ROLES.USER,
+]
+
 router.get(
   '/',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
@@ -15,27 +26,27 @@ router.get(
 
 router.get(
   '/:id',
-  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.USER),
+  auth(...ALL_ROLES),
   SupportController.getSingleSupport,
 )
 
 router.post(
   '/',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   validateRequest(createSupportSchema),
   SupportController.createSupport,
 )
 
 router.patch(
   '/:id',
-  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.USER),
+  auth(...ALL_ROLES),
   validateRequest(updateSupportSchema),
   SupportController.updateSupport,
 )
 
 router.delete(
   '/:id',
-  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.USER),
+  auth(...ALL_ROLES),
   SupportController.deleteSupport,
 )
 

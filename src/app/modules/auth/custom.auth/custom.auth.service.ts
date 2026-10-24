@@ -55,12 +55,23 @@ const createUser = async (payload: IUser) => {
     isVerified: false,
   }
 
-  // Extract role from payload (if provided)
+  // Extract role from payload (if provided) and prevent privilege escalation
   const { role, ...userData } = payload as any
+  const assignedRole = role || USER_ROLES.USER
+
+  if (
+    assignedRole === USER_ROLES.ADMIN ||
+    assignedRole === USER_ROLES.SUPER_ADMIN
+  ) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      'Administrative accounts cannot be registered via public signup.',
+    )
+  }
 
   const user = await User.create({
     ...userData,
-    role: role || USER_ROLES.USER,
+    role: assignedRole,
     password: payload.password,
     authentication,
   })

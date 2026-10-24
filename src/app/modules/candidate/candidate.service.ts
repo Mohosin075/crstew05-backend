@@ -6,7 +6,7 @@ import { Opportunity } from '../opportunity/opportunity.model'
 import { Organization } from '../organization/organization.model'
 import { User } from '../user/user.model'
 import { Types } from 'mongoose'
-import { VERIFICATION_STATUS } from '../../../enum/user'
+import { USER_ROLES, VERIFICATION_STATUS } from '../../../enum/user'
 import { Shortlist } from './shortlist.model'
 import { QueryBuilder } from '../../../builder/QueryBuilder'
 import {
@@ -112,11 +112,30 @@ const getPipelineBoard = async (userId: string, opportunityId?: string) => {
   return board
 }
 
+const verifyCandidateAccess = async (
+  candidateOrgId: Types.ObjectId,
+  userId: string,
+) => {
+  const user = await User.findById(userId).lean()
+  if (user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.SUPER_ADMIN) {
+    return
+  }
+  const { org } = await resolveUserOrganization(userId)
+  if (!org || org._id.toString() !== candidateOrgId.toString()) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      'You do not have permission to access or modify candidates for this organization',
+    )
+  }
+}
+
 const getById = async (id: string, userId: string) => {
   const candidate = await Candidate.findById(id).lean()
   if (!candidate) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Candidate record not found')
   }
+
+  await verifyCandidateAccess(candidate.organizationId, userId)
 
   return {
     ...candidate,
@@ -133,6 +152,8 @@ const updateStage = async (
   if (!candidate) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Candidate not found')
   }
+
+  await verifyCandidateAccess(candidate.organizationId, userId)
 
   const prevStage = candidate.pipelineStage
   candidate.pipelineStage = stage
@@ -163,6 +184,8 @@ const addNote = async (
     throw new ApiError(StatusCodes.NOT_FOUND, 'Candidate record not found')
   }
 
+  await verifyCandidateAccess(candidate.organizationId, userId)
+
   const note = {
     _id: new Types.ObjectId(),
     candidateId: candidate._id,
@@ -187,11 +210,13 @@ const addNote = async (
   }
 }
 
-const getNotes = async (candidateId: string) => {
+const getNotes = async (candidateId: string, userId: string) => {
   const candidate = await Candidate.findById(candidateId).lean()
   if (!candidate) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Candidate not found')
   }
+
+  await verifyCandidateAccess(candidate.organizationId, userId)
 
   return (candidate.notesList || []).map((n: any) => ({
     id: n._id?.toString(),
@@ -206,11 +231,14 @@ const getNotes = async (candidateId: string) => {
 const updateRating = async (
   candidateId: string,
   rating: number,
+  userId: string,
 ) => {
   const candidate = await Candidate.findById(candidateId)
   if (!candidate) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Candidate not found')
   }
+
+  await verifyCandidateAccess(candidate.organizationId, userId)
 
   candidate.internalRating = rating
   candidate.lastUpdatedAt = new Date()

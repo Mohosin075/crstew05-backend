@@ -80,16 +80,27 @@ router.post(
   CustomAuthController.resendOtp,
 )
 
+const ALL_AUTHENTICATED_ROLES = [
+  USER_ROLES.SUPER_ADMIN,
+  USER_ROLES.ADMIN,
+  USER_ROLES.COACH,
+  USER_ROLES.COLLEGIATE,
+  USER_ROLES.TEAM,
+  USER_ROLES.AGENCY,
+  USER_ROLES.ORGANIZATION,
+  USER_ROLES.USER,
+]
+
 router.post(
   '/change-password',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_AUTHENTICATED_ROLES),
   validateRequest(AuthValidations.changePasswordZodSchema),
   CustomAuthController.changePassword,
 )
 
 router.delete(
   '/delete-account',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_AUTHENTICATED_ROLES),
   validateRequest(AuthValidations.deleteAccount),
   CustomAuthController.deleteAccount,
 )
@@ -105,7 +116,7 @@ router.post(
 
 router.post(
   '/logout',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_AUTHENTICATED_ROLES),
   CustomAuthController.logout,
 )
 

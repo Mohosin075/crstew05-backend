@@ -5,21 +5,32 @@ import { USER_ROLES } from '../../../enum/user'
 
 const router = express.Router()
 
+const ALL_ROLES = [
+  USER_ROLES.SUPER_ADMIN,
+  USER_ROLES.ADMIN,
+  USER_ROLES.COACH,
+  USER_ROLES.COLLEGIATE,
+  USER_ROLES.TEAM,
+  USER_ROLES.AGENCY,
+  USER_ROLES.ORGANIZATION,
+  USER_ROLES.USER,
+]
+
 router.post(
   '/contact-admin',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   ChatController.createAdminChat,
 )
 
 router.post(
   '/:id',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   ChatController.createChat,
 )
 
 router.get(
   '/',
-  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  auth(...ALL_ROLES),
   ChatController.getChat,
 )
 

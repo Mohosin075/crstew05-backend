@@ -3,9 +3,15 @@ import ApiError from '../../../errors/ApiError'
 import { Opportunity } from './opportunity.model'
 import { IOpportunity } from './opportunity.interface'
 import { Organization } from '../organization/organization.model'
+import { User } from '../user/user.model'
 import { QueryBuilder } from '../../../builder/QueryBuilder'
 import { USER_ROLES } from '../../../enum/user'
-import { requireUserOrganization } from '../../../helpers/organizationHelper'
+import {
+  requireUserOrganization,
+  resolveUserOrganization,
+} from '../../../helpers/organizationHelper'
+import { Types } from 'mongoose'
+
 
 const createOpportunity = async (
   userId: string,
@@ -133,6 +139,23 @@ const getOpportunityById = async (id: string) => {
   }
 }
 
+const verifyOpportunityAccess = async (
+  opportunityOrgId: string | Types.ObjectId,
+  userId: string,
+) => {
+  const user = await User.findById(userId).lean()
+  if (user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.SUPER_ADMIN) {
+    return
+  }
+  const { org } = await resolveUserOrganization(userId)
+  if (!org || org._id.toString() !== opportunityOrgId.toString()) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      'You do not have permission to manage this opportunity',
+    )
+  }
+}
+
 const updateOpportunity = async (
   id: string,
   userId: string,
@@ -142,6 +165,8 @@ const updateOpportunity = async (
   if (!opportunity) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Opportunity not found')
   }
+
+  await verifyOpportunityAccess(opportunity.organizationId, userId)
 
   const updatedOpp = await Opportunity.findByIdAndUpdate(
     id,
@@ -160,6 +185,8 @@ const closeOpportunity = async (id: string, userId: string) => {
   if (!opportunity) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Opportunity not found')
   }
+
+  await verifyOpportunityAccess(opportunity.organizationId, userId)
 
   opportunity.status = 'closed'
   opportunity.closingAt = new Date()
