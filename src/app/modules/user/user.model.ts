@@ -1,7 +1,60 @@
 import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt'
 import { IUser, UserModel } from './user.interface'
-import { USER_ROLES, USER_STATUS } from '../../../enum/user'
+import { CAREER_STATUS, USER_ROLES, USER_STATUS, VERIFICATION_STATUS } from '../../../enum/user'
+
+// ------------------ SUB-SCHEMAS ------------------
+const CoachExperienceSchema = new Schema(
+  {
+    role: { type: String, required: true },
+    organization: { type: String, required: true },
+    level: { type: String, required: true },
+    startYear: { type: Number, required: true },
+    endYear: { type: Number },
+    isCurrentRole: { type: Boolean, default: false },
+    highlights: { type: [String], default: [] },
+    divisionBadge: { type: String },
+  },
+  { _id: true },
+)
+
+const CoachEducationSchema = new Schema(
+  {
+    degree: { type: String, required: true },
+    institution: { type: String, required: true },
+    year: { type: String, required: true },
+  },
+  { _id: true },
+)
+
+const CoachCredentialSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    issuingBody: { type: String },
+    verificationStatus: {
+      type: String,
+      enum: Object.values(VERIFICATION_STATUS),
+      default: VERIFICATION_STATUS.UNVERIFIED,
+    },
+    documentUrl: { type: String },
+  },
+  { _id: true },
+)
+
+const RecruitingFootprintSchema = new Schema(
+  {
+    description: { type: String },
+    mapStates: { type: [String], default: [] },
+    topStates: [
+      {
+        state: { type: String, required: true },
+        level: { type: String, enum: ['High', 'Med', 'Low'], default: 'Med' },
+        percentage: { type: Number, default: 0 },
+      },
+    ],
+  },
+  { _id: false },
+)
 
 // ------------------ USER SCHEMA ------------------
 const UserSchema = new Schema<IUser, UserModel>(
@@ -62,6 +115,71 @@ const UserSchema = new Schema<IUser, UserModel>(
     timezone: { type: String, default: 'UTC' },
     isOnboardingComplete: { type: Boolean, default: false },
 
+    // --- COACH SPECIFIC PROFILE DATA ---
+    headline: { type: String, trim: true },
+    bio: { type: String },
+    coachingPhilosophy: { type: String },
+    currentRole: { type: String, trim: true },
+    currentOrganization: { type: String, trim: true },
+    highestLevel: { type: String, trim: true },
+    yearsExperience: { type: Number, default: 0 },
+    careerStatus: {
+      type: String,
+      enum: Object.values(CAREER_STATUS),
+      default: CAREER_STATUS.ACTIVELY_LOOKING,
+    },
+    isPro: { type: Boolean, default: false },
+    isProCertified: { type: Boolean, default: false },
+    identityVerification: {
+      type: String,
+      enum: Object.values(VERIFICATION_STATUS),
+      default: VERIFICATION_STATUS.UNVERIFIED,
+    },
+    experienceVerification: {
+      type: String,
+      enum: Object.values(VERIFICATION_STATUS),
+      default: VERIFICATION_STATUS.UNVERIFIED,
+    },
+    credentialsVerification: {
+      type: String,
+      enum: Object.values(VERIFICATION_STATUS),
+      default: VERIFICATION_STATUS.UNVERIFIED,
+    },
+    profileCompletionPercent: { type: Number, default: 0 },
+    profileProgress: { type: Number, default: 0 },
+
+    expertise: {
+      primary: { type: [String], default: [] },
+      secondary: { type: [String], default: [] },
+      schemes: { type: [String], default: [] },
+    },
+
+    careerPreferences: {
+      desiredPositions: { type: [String], default: [] },
+      desiredLevels: { type: [String], default: [] },
+      preferredRegions: { type: [String], default: [] },
+      isOpenToRelocation: { type: Boolean, default: false },
+      notes: { type: String },
+    },
+
+    recruitingFootprint: RecruitingFootprintSchema,
+    experienceList: [CoachExperienceSchema],
+    educationList: [CoachEducationSchema],
+    credentialsList: [CoachCredentialSchema],
+
+    // Privacy & Contact controls
+    allowsRecruiterContact: { type: Boolean, default: true },
+    profileVisibility: {
+      type: String,
+      enum: ['public', 'network_only', 'private'],
+      default: 'public',
+    },
+    resumeUrl: { type: String },
+
+    // Organization linkage & recruitment bookmarks
+    organizationId: { type: Schema.Types.ObjectId, ref: 'Organization' },
+    savedCoaches: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+
     settings: {
       pushNotification: { type: Boolean, default: true },
       emailNotification: { type: Boolean, default: true },
@@ -94,15 +212,44 @@ const UserSchema = new Schema<IUser, UserModel>(
   },
 )
 
-// ------------------ INDEXES ------------------
-UserSchema.index({ location: '2dsphere' }) // Geo queries support
-UserSchema.index({ verified: 1, createdAt: 1 }) // Optimize unverified user cleanup cron
-UserSchema.index({ role: 1, status: 1 }) // Optimize user filtering by role and status
+// ------------------ INDEXES (Production Grade Optimization) ------------------
+UserSchema.index({ location: '2dsphere' })
+UserSchema.index({ verified: 1, createdAt: 1 })
+UserSchema.index({ role: 1, status: 1 })
+UserSchema.index({ role: 1, careerStatus: 1 })
+UserSchema.index({ role: 1, highestLevel: 1 })
+UserSchema.index({ role: 1, currentRole: 1 })
+UserSchema.index({ role: 1, 'address.city': 1 })
+UserSchema.index({ role: 1, isPro: 1 })
+UserSchema.index({ role: 1, 'expertise.primary': 1 })
+UserSchema.index({ role: 1, 'careerPreferences.desiredPositions': 1 })
+UserSchema.index({ organizationId: 1, role: 1 })
 
 // ------------------ PRE HOOKS ------------------
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next()
-  this.password = await bcrypt.hash(this.password, 10)
+  // Password hashing
+  if (this.isModified('password') && this.password) {
+    this.password = await bcrypt.hash(this.password, 10)
+  }
+
+  // Auto-calculate Profile Completion Percentage for Coaches
+  if (this.role === USER_ROLES.COACH) {
+    let score = 0
+    if (this.name || this.fullName) score += 10
+    if (this.email) score += 10
+    if (this.profile) score += 10
+    if (this.headline || this.bio) score += 10
+    if (this.coachingPhilosophy) score += 10
+    if (this.currentRole) score += 10
+    if (this.expertise?.primary?.length) score += 10
+    if (this.experienceList?.length) score += 15
+    if (this.credentialsList?.length) score += 10
+    if (this.careerPreferences?.desiredPositions?.length) score += 5
+
+    this.profileCompletionPercent = Math.min(score, 100)
+    this.profileProgress = this.profileCompletionPercent
+  }
+
   next()
 })
 
@@ -116,3 +263,4 @@ UserSchema.statics.isPasswordMatched = async function (
 
 // ------------------ MODEL ------------------
 export const User = model<IUser, UserModel>('User', UserSchema)
+

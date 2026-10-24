@@ -134,6 +134,80 @@ const downloadAccountData = catchAsync(async (req: Request, res: Response) => {
   res.status(StatusCodes.OK).send(JSON.stringify(result, null, 2))
 })
 
+const searchCoaches = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.searchCoaches(req.query)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Coaches retrieved successfully',
+    meta: result.meta,
+    data: result.data,
+  })
+})
+
+const getCoachById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params
+  const result = await UserServices.getCoachById(id)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Coach profile retrieved successfully',
+    data: result,
+  })
+})
+
+const getRecommendedCoaches = catchAsync(
+  async (req: Request, res: Response) => {
+    const limit = Number(req.query.limit) || 5
+    const result = await UserServices.getRecommendedCoaches(limit)
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: 'Recommended coaches retrieved successfully',
+      data: result,
+    })
+  },
+)
+
+const saveCoach = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload
+  const { coachId } = req.params
+  const result = await UserServices.toggleSaveCoach(user.userId, coachId, 'save')
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  })
+})
+
+const unsaveCoach = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload
+  const { coachId } = req.params
+  const result = await UserServices.toggleSaveCoach(
+    user.userId,
+    coachId,
+    'unsave',
+  )
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  })
+})
+
+const getSavedCoaches = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload
+  const result = await UserServices.getSavedCoaches(user.userId)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Saved coaches retrieved successfully',
+    data: result,
+  })
+})
+
 export const UserController = {
   updateProfile,
   getAllUsers,
@@ -144,4 +218,11 @@ export const UserController = {
   deleteProfile,
   deactivateProfile,
   downloadAccountData,
+  searchCoaches,
+  getCoachById,
+  getRecommendedCoaches,
+  saveCoach,
+  unsaveCoach,
+  getSavedCoaches,
 }
+
