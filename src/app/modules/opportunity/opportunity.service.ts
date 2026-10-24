@@ -3,36 +3,16 @@ import ApiError from '../../../errors/ApiError'
 import { Opportunity } from './opportunity.model'
 import { IOpportunity } from './opportunity.interface'
 import { Organization } from '../organization/organization.model'
-import { User } from '../user/user.model'
 import { QueryBuilder } from '../../../builder/QueryBuilder'
 import { USER_ROLES } from '../../../enum/user'
-import { Types } from 'mongoose'
+import { requireUserOrganization } from '../../../helpers/organizationHelper'
 
 const createOpportunity = async (
   userId: string,
   userRole: string,
   payload: Partial<IOpportunity>,
 ) => {
-  // Find organization
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
-
-  if (!org) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'You must be part of an organization to post an opportunity',
-    )
-  }
+  const { org } = await requireUserOrganization(userId)
 
   const opportunity = await Opportunity.create({
     ...payload,

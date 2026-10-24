@@ -8,93 +8,74 @@ import { User } from '../user/user.model'
 import { Types } from 'mongoose'
 import { VERIFICATION_STATUS } from '../../../enum/user'
 import { Shortlist } from './shortlist.model'
-
+import { QueryBuilder } from '../../../builder/QueryBuilder'
+import {
+  requireUserOrganization,
+  resolveUserOrganization,
+} from '../../../helpers/organizationHelper'
 
 const getAll = async (
   userId: string,
   query: Record<string, unknown>,
 ) => {
-  // Resolve user's organization
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
+  const { org } = await requireUserOrganization(userId)
 
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
-
-  if (!org) {
-    throw new ApiError(StatusCodes.FORBIDDEN, 'No organization associated with this account')
-  }
-
-  const filter: Record<string, unknown> = {
+  const baseFilter: Record<string, unknown> = {
     organizationId: org._id,
   }
 
   if (query.opportunityId) {
-    filter.opportunityId = query.opportunityId
+    baseFilter.opportunityId = query.opportunityId
   }
 
   if (query.stages) {
     const stages = Array.isArray(query.stages) ? query.stages : [query.stages]
-    filter.pipelineStage = { $in: stages }
+    baseFilter.pipelineStage = { $in: stages }
   }
 
   if (query.assignedRecruiter) {
-    filter.assignedRecruiter = query.assignedRecruiter
+    baseFilter.assignedRecruiter = query.assignedRecruiter
   }
 
-  const page = Number(query.page) || 1
-  const limit = Number(query.limit) || 20
-  const skip = (page - 1) * limit
+  const candidateQuery = new QueryBuilder(Candidate.find(baseFilter), query)
+    .search([
+      'coachSnapshot.name',
+      'coachSnapshot.position',
+      'coachSnapshot.university',
+      'internalNotes',
+    ])
+    .filter([
+      'opportunityId',
+      'stages',
+      'assignedRecruiter',
+      'searchTerm',
+      'sort',
+      'sortBy',
+      'sortOrder',
+      'limit',
+      'page',
+    ])
+    .sort()
+    .paginate()
 
-  const [candidates, total] = await Promise.all([
-    Candidate.find(filter)
-      .sort({ lastUpdatedAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-    Candidate.countDocuments(filter),
+  const [candidates, meta] = await Promise.all([
+    candidateQuery.modelQuery.lean(),
+    candidateQuery.countTotal(),
   ])
 
-  const formatted = candidates.map(c => ({
+  const formatted = candidates.map((c: any) => ({
     ...c,
     id: c._id.toString(),
   }))
 
   return {
-    meta: {
-      page,
-      limit,
-      total,
-      totalPage: Math.ceil(total / limit),
-    },
+    meta,
     data: formatted,
   }
 }
 
 const getPipelineBoard = async (userId: string, opportunityId?: string) => {
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
-
-  if (!org) {
-    throw new ApiError(StatusCodes.FORBIDDEN, 'No organization associated with this account')
-  }
+  const { org } = await requireUserOrganization(userId)
 
   const filter: Record<string, unknown> = { organizationId: org._id }
   if (opportunityId) {
@@ -319,18 +300,7 @@ const expressInterest = async (
 }
 
 const getExpressInterests = async (userId: string, opportunityId?: string) => {
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
+  const { org } = await resolveUserOrganization(userId)
 
   const filter: Record<string, unknown> = {
     expressInterestAt: { $exists: true, $ne: null },

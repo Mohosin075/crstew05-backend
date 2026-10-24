@@ -12,21 +12,10 @@ import { User } from '../user/user.model'
 import { USER_ROLES, USER_STATUS, VERIFICATION_STATUS } from '../../../enum/user'
 import { Types } from 'mongoose'
 import { SubscriptionModel } from '../subscription/subscription.model'
-
+import { resolveUserOrganization } from '../../../helpers/organizationHelper'
 
 const getOrgSummary = async (userId: string): Promise<IOrgAnalyticsSummary> => {
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
+  const { org } = await resolveUserOrganization(userId)
 
   if (!org) {
     // Return empty metrics if user has no org yet

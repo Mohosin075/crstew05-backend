@@ -1,14 +1,23 @@
 import { Schema, model } from 'mongoose'
 import { IOrganization, OrganizationModel } from './organization.interface'
 import { USER_ROLES, VERIFICATION_STATUS } from '../../../enum/user'
+import {
+  COLLEGIATE_DIVISION,
+  ORGANIZATION_TYPE,
+  ORG_MEMBER_ROLE,
+} from '../../../enum/organization'
+import {
+  SUBSCRIPTION_PLAN,
+  SUBSCRIPTION_STATUS,
+} from '../../../enum/subscription'
 
 const OrganizationMemberSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     role: {
       type: String,
-      enum: ['admin', 'recruiter', 'staff', 'read_only'],
-      default: 'recruiter',
+      enum: Object.values(ORG_MEMBER_ROLE),
+      default: ORG_MEMBER_ROLE.RECRUITER,
     },
     joinedAt: { type: Date, default: Date.now },
     lastActive: { type: Date, default: Date.now },
@@ -21,8 +30,8 @@ const OrgInviteSchema = new Schema(
     email: { type: String, required: true, lowercase: true, trim: true },
     role: {
       type: String,
-      enum: ['admin', 'recruiter', 'staff', 'read_only'],
-      default: 'recruiter',
+      enum: Object.values(ORG_MEMBER_ROLE),
+      default: ORG_MEMBER_ROLE.RECRUITER,
     },
     invitedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     sentAt: { type: Date, default: Date.now },
@@ -42,13 +51,7 @@ const OrganizationSchema = new Schema<IOrganization, OrganizationModel>(
     name: { type: String, required: true, trim: true },
     type: {
       type: String,
-      enum: [
-        'collegiate_program',
-        'professional_team',
-        'recruiting_agency',
-        'organization',
-        'high_school',
-      ],
+      enum: Object.values(ORGANIZATION_TYPE),
       required: true,
     },
     role: {
@@ -78,13 +81,13 @@ const OrganizationSchema = new Schema<IOrganization, OrganizationModel>(
     subscription: {
       plan: {
         type: String,
-        enum: ['coach_free', 'coach_pro', 'org_basic', 'org_pro', 'enterprise'],
-        default: 'org_basic',
+        enum: Object.values(SUBSCRIPTION_PLAN),
+        default: SUBSCRIPTION_PLAN.ORG_BASIC,
       },
       status: {
         type: String,
-        enum: ['active', 'trialing', 'past_due', 'canceled', 'founding'],
-        default: 'active',
+        enum: Object.values(SUBSCRIPTION_STATUS),
+        default: SUBSCRIPTION_STATUS.ACTIVE,
       },
       currentPeriodEnd: { type: Date },
     },
@@ -93,7 +96,7 @@ const OrganizationSchema = new Schema<IOrganization, OrganizationModel>(
     conference: { type: String },
     division: {
       type: String,
-      enum: ['FBS', 'FCS', 'D2', 'D3', 'NAIA', 'JUCO'],
+      enum: Object.values(COLLEGIATE_DIVISION),
     },
     sports: { type: [String], default: ['Football'] },
     league: { type: String },

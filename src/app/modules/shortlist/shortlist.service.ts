@@ -3,25 +3,13 @@ import ApiError from '../../../errors/ApiError'
 import { Shortlist } from './shortlist.model'
 import { IShortlistItem } from './shortlist.interface'
 import { User } from '../user/user.model'
-import { Organization } from '../organization/organization.model'
 import { Types } from 'mongoose'
 import { VERIFICATION_STATUS } from '../../../enum/user'
+import { resolveUserOrganization } from '../../../helpers/organizationHelper'
 
 const resolveOrganizationId = async (userId: string): Promise<Types.ObjectId> => {
-  const user = await User.findById(userId).lean()
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-
-  const org = await Organization.findOne({
-    $or: [
-      { _id: user.organizationId },
-      { owner: userId },
-      { 'members.user': new Types.ObjectId(userId) },
-    ],
-  }).lean()
-
-  return org ? (org._id as Types.ObjectId) : user._id
+  const { user, org } = await resolveUserOrganization(userId)
+  return org ? (org._id as Types.ObjectId) : (user._id as Types.ObjectId)
 }
 
 const getAllShortlists = async (userId: string): Promise<IShortlistItem[]> => {

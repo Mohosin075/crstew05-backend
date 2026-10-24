@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose'
 import { ICandidateRecord, CandidateModel } from './candidate.interface'
+import { PIPELINE_STAGE } from '../../../enum/candidate'
 
 const CandidateNoteSchema = new Schema(
   {
@@ -43,17 +44,10 @@ const CandidateSchema = new Schema<ICandidateRecord, CandidateModel>(
 
     pipelineStage: {
       type: String,
-      enum: [
-        'discovered',
-        'saved',
-        'contacted',
-        'interested',
-        'interview',
-        'offer',
-        'hired',
-      ],
-      default: 'discovered',
+      enum: Object.values(PIPELINE_STAGE),
+      default: PIPELINE_STAGE.DISCOVERED,
     },
+
 
     internalRating: { type: Number, min: 1, max: 5 },
     internalNotes: { type: String },
@@ -96,6 +90,7 @@ CandidateSchema.index({ organizationId: 1, pipelineStage: 1 })
 CandidateSchema.index({ coachId: 1, organizationId: 1, opportunityId: 1 }, { unique: true })
 CandidateSchema.index({ opportunityId: 1, pipelineStage: 1 })
 CandidateSchema.index({ organizationId: 1, internalRating: -1 })
+CandidateSchema.index({ organizationId: 1, expressInterestAt: -1 })
 
 export const Candidate = model<ICandidateRecord, CandidateModel>(
   'Candidate',

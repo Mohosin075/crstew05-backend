@@ -1,6 +1,10 @@
 import { Schema, model } from 'mongoose'
 import { IOpportunity, OpportunityModel } from './opportunity.interface'
 import { USER_ROLES } from '../../../enum/user'
+import {
+  OPPORTUNITY_STATUS,
+  OPPORTUNITY_TYPE,
+} from '../../../enum/opportunity'
 
 const OpportunitySchema = new Schema<IOpportunity, OpportunityModel>(
   {
@@ -17,16 +21,8 @@ const OpportunitySchema = new Schema<IOpportunity, OpportunityModel>(
     level: { type: String, required: true, trim: true },
     type: {
       type: String,
-      enum: [
-        'full_time',
-        'part_time',
-        'contract',
-        'volunteer',
-        'clinic',
-        'camp',
-        'event',
-      ],
-      default: 'full_time',
+      enum: Object.values(OPPORTUNITY_TYPE),
+      default: OPPORTUNITY_TYPE.FULL_TIME,
     },
     location: { type: String, required: true },
     isRemote: { type: Boolean, default: false },
@@ -37,9 +33,10 @@ const OpportunitySchema = new Schema<IOpportunity, OpportunityModel>(
 
     status: {
       type: String,
-      enum: ['draft', 'active', 'paused', 'closed', 'filled'],
-      default: 'active',
+      enum: Object.values(OPPORTUNITY_STATUS),
+      default: OPPORTUNITY_STATUS.ACTIVE,
     },
+
     isFeatured: { type: Boolean, default: false },
     isSponsored: { type: Boolean, default: false },
     isUrgent: { type: Boolean, default: false },
