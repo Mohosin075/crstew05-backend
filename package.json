@@ -24,6 +24,7 @@
     "test:flows": "node scripts/test-all-flows.js",
     "test:watch": "jest --watch",
     "seed": "ts-node src/seed/seedData.ts",
+    "postman:generate": "node scripts/generate-postman.js",
     "prepare": "husky"
   },
   "dependencies": {
