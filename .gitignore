@@ -7,8 +7,6 @@ build/
 .tsbuildinfo
 
 # Environment variables
-.env
-.env.*
 !.env.example
 
 # Logs
@@ -22,7 +20,6 @@ yarn-error.log*
 uploads/
 
 # IDEs & Editors
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -45,3 +42,4 @@ firebase-service-account.json
 *firebase*.json
 *.pem
 *.key
+config.bat
